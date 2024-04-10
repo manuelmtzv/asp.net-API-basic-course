@@ -1,0 +1,11 @@
+@start_HostAddress = http://localhost:5237
+
+GET {{start_HostAddress}}/todos/
+Accept: application/json
+
+###
+
+GET {{start_HostAddress}}/todos/1
+Accept: application/json
+
+###
