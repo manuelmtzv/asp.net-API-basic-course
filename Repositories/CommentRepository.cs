@@ -1,13 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using start.Data;
 using start.Dtos.Comment;
 using start.Interfaces;
-using start.Mappers;
 using start.Models;
 
 namespace start.Repositories
@@ -38,19 +33,17 @@ namespace start.Repositories
             return comment;
         }
 
-        public async Task<Comment?> UpdateAsync(int id, UpdateCommentDto updateDto)
+        public async Task<Comment?> UpdateAsync(int id, Comment comment)
         {
-            var existingComment = await _context.Comments.FindAsync(id);
-            if (existingComment == null) return null;
+            var commentModel = await _context.Comments.FindAsync(id);
+            if (commentModel == null) return null;
 
-            existingComment.Title = updateDto.Title;
-            existingComment.Content = updateDto.Content;
-            existingComment.CreatedAt = updateDto.CreatedAt;
-            existingComment.StockId = updateDto.StockId;
+            commentModel.Title = comment.Title;
+            commentModel.Content = comment.Content;
 
             await _context.SaveChangesAsync();
 
-            return existingComment;
+            return commentModel;
         }
 
         public async Task<Comment?> DeleteAsync(int id)

@@ -16,12 +16,12 @@ namespace start.Repositories
 
         public async Task<List<Stock>> GetAllAsync()
         {
-            return await _context.Stocks.ToListAsync();
+            return await _context.Stocks.Include(stock => stock.Comments).ToListAsync();
         }
 
         public async Task<Stock?> GetByIdAsync(int id)
         {   
-            var stockModel = await _context.Stocks.FindAsync(id);
+            var stockModel = await _context.Stocks.Include(c => c.Comments).FirstOrDefaultAsync(stock => stock.Id == id);
 
             if (stockModel == null) return null;
 
@@ -37,18 +37,18 @@ namespace start.Repositories
         }
 
 
-        public async Task<Stock?> UpdateAsync(int id, UpdateStockDto updateDto)
+        public async Task<Stock?> UpdateAsync(int id, Stock stock)
         {
             var stockModel = _context.Stocks.Find(id);
 
             if (stockModel == null) return null;
 
-            stockModel.Symbol = updateDto.Symbol;
-            stockModel.CompanyName = updateDto.CompanyName;
-            stockModel.Purchase = updateDto.Purchase;
-            stockModel.LastDiv = updateDto.LastDiv;
-            stockModel.Industry = updateDto.Industry;
-            stockModel.MarketCap = updateDto.MarketCap;          
+            stockModel.Symbol = stock.Symbol;
+            stockModel.CompanyName = stock.CompanyName;
+            stockModel.Purchase = stock.Purchase;
+            stockModel.LastDiv = stock.LastDiv;
+            stockModel.Industry = stock.Industry;
+            stockModel.MarketCap = stock.MarketCap;          
 
             await _context.SaveChangesAsync();
 
@@ -66,5 +66,10 @@ namespace start.Repositories
 
             return stockModel;
         }        
+
+        public async Task<bool> StockExistsAsync(int id)
+        {
+            return await _context.Stocks.AnyAsync(stock => stock.Id == id);
+        }
     }
 }

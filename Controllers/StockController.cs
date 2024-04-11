@@ -49,7 +49,7 @@ namespace start.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockDto updateDto) 
         {
-            var stockModel = await _stockRepository.UpdateAsync(id, updateDto);
+            var stockModel = await _stockRepository.UpdateAsync(id, updateDto.ToStockFromUpdateDto());
 
             if (stockModel == null) return NotFound();
 

@@ -11,7 +11,7 @@ namespace start.Interfaces
 
     Task<Comment> CreateAsync(Comment comment);
 
-    Task<Comment?> UpdateAsync(int id, UpdateCommentDto updateDto);
+    Task<Comment?> UpdateAsync(int id, Comment comment);
 
     Task<Comment?> DeleteAsync(int id);      
   }
