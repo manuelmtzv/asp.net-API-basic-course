@@ -1,11 +1,11 @@
 @start_HostAddress = http://localhost:5237
 
-GET {{start_HostAddress}}/todos/
+GET {{start_HostAddress}}/stock/
 Accept: application/json
 
 ###
 
-GET {{start_HostAddress}}/todos/1
+GET {{start_HostAddress}}/stock/1
 Accept: application/json
 
 ###
