@@ -4,12 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using start.Dtos.Stock;
 using start.Models;
+using start.QueryObjects;
 
 namespace start.Interfaces
 {
     public interface IStockRepository
     {
-        Task<List<Stock>> GetAllAsync();
+        Task<List<Stock>> GetAllAsync(StockQueryObject queryObject);
 
         Task<Stock?> GetByIdAsync(int id);
 

@@ -7,6 +7,7 @@ using start.Data;
 using start.Dtos.Stock;
 using start.Interfaces;
 using start.Models;
+using start.QueryObjects;
 
 namespace start.Repositories
 {
@@ -14,13 +15,35 @@ namespace start.Repositories
     {
         private readonly ApplicationDBContext _context = context;
 
-        public async Task<List<Stock>> GetAllAsync()
+        public async Task<List<Stock>> GetAllAsync(StockQueryObject queryObject)
         {
-            return await _context.Stocks.Include(stock => stock.Comments).ToListAsync();
+            var stocks = _context.Stocks.Include(stock => stock.Comments).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(queryObject.Symbol))
+            {
+                stocks = stocks.Where(stock => stock.Symbol.Contains(queryObject.Symbol));
+            }
+
+            if (!string.IsNullOrWhiteSpace(queryObject.CompanyName))
+            {
+                stocks = stocks.Where(stock => stock.CompanyName.Contains(queryObject.CompanyName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(queryObject.SortBy))
+            {
+                if (queryObject.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase))
+                {
+                    stocks = queryObject.IsDescending
+                        ? stocks.OrderByDescending(stock => stock.Symbol)
+                        : stocks.OrderBy(stock => stock.Symbol);
+                }
+            }
+
+            return await stocks.ToListAsync();
         }
 
         public async Task<Stock?> GetByIdAsync(int id)
-        {   
+        {
             var stockModel = await _context.Stocks.Include(c => c.Comments).FirstOrDefaultAsync(stock => stock.Id == id);
 
             if (stockModel == null) return null;
@@ -48,7 +71,7 @@ namespace start.Repositories
             stockModel.Purchase = stock.Purchase;
             stockModel.LastDiv = stock.LastDiv;
             stockModel.Industry = stock.Industry;
-            stockModel.MarketCap = stock.MarketCap;          
+            stockModel.MarketCap = stock.MarketCap;
 
             await _context.SaveChangesAsync();
 
@@ -65,7 +88,7 @@ namespace start.Repositories
             await _context.SaveChangesAsync();
 
             return stockModel;
-        }        
+        }
 
         public async Task<bool> StockExistsAsync(int id)
         {

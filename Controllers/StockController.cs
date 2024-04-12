@@ -1,15 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using start.Data;
 using start.Dtos.Stock;
 using start.Interfaces;
 using start.Mappers;
-using start.Models;
-using start.Repositories;
+using start.QueryObjects;
 
 namespace start.Controllers
 {
@@ -22,14 +17,14 @@ namespace start.Controllers
 
         [HttpGet]
         
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] StockQueryObject queryObject)
         {
-            var stocks = await _stockRepository.GetAllAsync(); 
+            var stocks = await _stockRepository.GetAllAsync(queryObject); 
 
             return Ok(stocks.Select(stock => stock.ToStockDto()));
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             var stock = await _stockRepository.GetByIdAsync(id);
@@ -46,7 +41,7 @@ namespace start.Controllers
             return CreatedAtAction(nameof (GetById), new { id = stockModel.Id }, stockModel.ToStockDto());
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockDto updateDto) 
         {
             var stockModel = await _stockRepository.UpdateAsync(id, updateDto.ToStockFromUpdateDto());
@@ -56,7 +51,7 @@ namespace start.Controllers
             return Ok(stockModel.ToStockDto());
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             var stockModel = await _stockRepository.DeleteAsync(id);
