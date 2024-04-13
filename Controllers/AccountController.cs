@@ -5,15 +5,18 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using start.Dtos;
+using start.Dtos.Account;
+using start.Interfaces;
 using start.Models;
 
 namespace start.Controllers
 {
     [Route("/account")]
     [ApiController]
-    public class AccountController(UserManager<User> userManager) : ControllerBase
+    public class AccountController(UserManager<User> userManager, ITokenService tokenService) : ControllerBase
     {
         private readonly UserManager<User> _userManager = userManager;
+        private readonly ITokenService _tokenService = tokenService;
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] AccountRegisterDto registerDto)
@@ -36,7 +39,14 @@ namespace start.Controllers
                     var roleResult = await _userManager.AddToRoleAsync(user, "User");
 
                     return roleResult.Succeeded
-                        ? Ok("User created successfully")
+                        ? Ok(
+                            new NewAccountDto
+                            {
+                                UserName = user.UserName,
+                                Email = user.Email,
+                                Token = _tokenService.CreateToken(user)
+                            }
+                        )
                         : BadRequest("Failed to create user");
                 }
                 else
